@@ -28,19 +28,19 @@ class ManpageThread(threading.Thread):
 
     def run(self):
         def show_panel():
-        	if not self.req_function:
-        		return
+            if not self.req_function:
+                return
 
-        	self.window.show_quick_panel(self._get_function_list(), self.on_done)
+            self.window.show_quick_panel(self._get_function_list(), self.on_done)
             # provisional
 
         sublime.set_timeout(show_panel, 10)
 
     def on_done(self, picked):
-    	if picked == -1:
-    		return
+        if picked == -1:
+            return
 
-    	sublime.error_message("You have picked option: %s" 
+        sublime.error_message("You have picked option: %s" 
                               % self.function_list[picked])
 
     def _get_function_list(self):
