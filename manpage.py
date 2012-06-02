@@ -1,10 +1,13 @@
-import sublime
-import sublime_plugin
+# -*- coding: utf-8 –*–
+
 import threading
 import re
 from subprocess import Popen, PIPE
 
-WHATIS_RE = "(?P<func>\w+[^\(]+),?\s*\((?P<sect>\dp?m?)\)\s+-\s+(?P<desc>.*)$"
+import sublime
+import sublime_plugin
+
+WHATIS_RE = "^(?P<func>\w+[^\(])\s*\((?P<sect>\dp?m?)\)\s+-\s+(?P<desc>.*)$"
 
 class ManpageCommand(sublime_plugin.WindowCommand):
     def run(self):
@@ -35,7 +38,6 @@ class ManpageThread(threading.Thread):
 
             self.window.show_quick_panel(self._get_function_list(),
                                          self.on_done)
-            # provisional
 
         sublime.set_timeout(show_panel, 10)
 
@@ -43,13 +45,10 @@ class ManpageThread(threading.Thread):
         if picked == -1:
             return
 
-        sublime.error_message("You have picked option: %s"
-                              % self.function_list[picked])
+        sublime.error_message("Calling man for: %s"
+                              % self.function_list[picked][0])
 
     def _get_function_list(self):
-        # temporary
-        self.function_list.append(self.req_function)
-
         def split_whatis(lines):
             splited = list()
 
@@ -57,7 +56,7 @@ class ManpageThread(threading.Thread):
                 if ',' in line:
                     func_lst, desc = line.split('-')
                     for f in func_lst.split(','):
-                        splited.append("%s - %s" % (f, desc))
+                        splited.append("%s - %s" % (f.strip(), desc))
                 else:
                     splited.append(line)
 
@@ -69,7 +68,6 @@ class ManpageThread(threading.Thread):
 
         function_descriptions = whatis.communicate()[0]
         function_descriptions = function_descriptions.rstrip().split('\n')
-
         function_descriptions = split_whatis(function_descriptions)
 
         filtered_functions = list()
@@ -77,10 +75,14 @@ class ManpageThread(threading.Thread):
         sections = self.settings.get("sections", ["2", "3"])
 
         for item in function_descriptions:
-            mtch = re.search(WHATIS_RE, item)
-            if mtch:
-                dct = mtch.groupdict()
-                if dct["sect"] in sections:
-                    print "Matches: [name:%s] [section:%s]" % (dct["func"], dct["sect"],)
+            match = re.search(WHATIS_RE, item)
+            if match:
+                dct = match.groupdict()
+                if dct["sect"] in sections and dct["func"].find(self.req_function) != -1:
+                    self.function_list.append([dct["func"],
+                                              "(%s) : %s" % (dct["sect"], dct["desc"],)])
 
         return self.function_list
+
+    def _call_man(self, function):
+        pass
