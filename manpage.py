@@ -36,8 +36,14 @@ class ManpageThread(threading.Thread):
             if not self.req_function:
                 return
 
-            self.window.show_quick_panel(self._get_function_list(),
-                                         self.on_done)
+            func_list = self._get_function_list()
+            if not func_list:
+                return
+
+            if len(func_list) is not 1:
+                self.window.show_quick_panel(func_list, self.on_done)
+            else:
+                self.on_done(0)
 
         sublime.set_timeout(show_panel, 10)
 
@@ -45,8 +51,8 @@ class ManpageThread(threading.Thread):
         if picked == -1:
             return
 
-        sublime.error_message("Calling man for: %s"
-                              % self.function_list[picked][0])
+        manpage, title = self._call_man(self.function_list[picked])
+        self._render_manpage(manpage, title)
 
     def _get_function_list(self):
         def split_whatis(lines):
@@ -54,7 +60,12 @@ class ManpageThread(threading.Thread):
 
             for line in lines:
                 if ',' in line:
-                    func_lst, desc = line.split('-')
+                    # simple str.split() crashes on multiple '-' in description
+                    pattern = "(?P<func_lst>[^-]+)-(?P<desc>.*)"
+                    splited_line = re.match(pattern, line)
+                    splited_line = splited_line.groupdict()
+                    func_lst, desc = splited_line["func_lst"], splited_line["desc"]
+
                     for f in func_lst.split(','):
                         splited.append("%s - %s" % (f.strip(), desc))
                 else:
@@ -80,9 +91,36 @@ class ManpageThread(threading.Thread):
                 dct = match.groupdict()
                 if dct["sect"] in sections and dct["func"].find(self.req_function) != -1:
                     self.function_list.append([dct["func"],
-                                              "(%s) : %s" % (dct["sect"], dct["desc"],)])
+                                              "(%s) - %s" % (dct["sect"], dct["desc"],)])
+            else:
+                sublime.status_message(item)
+                return list()
 
         return self.function_list
 
     def _call_man(self, function):
-        pass
+        """ function = ['func', '(sect) - desc']"""
+        # screw it!
+        section = function[1].split('-')[0].strip(" ()")
+
+        cmd_man = ["man", section, function[0]]
+        cmd_col = ["col", "-b"]
+
+        man = Popen(cmd_man, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        col = Popen(cmd_col, stdin=man.stdout, stdout=PIPE, stderr=PIPE)
+
+        result = col.communicate()[0]
+
+        return (result, { "func" : function[0], "sect" : section})
+
+    def _render_manpage(self, manpage, desc):
+        view = self.window.new_file()
+
+        view.set_name("%s (%s)" % (desc["func"], desc["sect"]))
+        view.set_scratch(True)
+
+        edit = view.begin_edit()
+
+        view.insert(edit, 0, manpage)
+        view.end_edit(edit)
+        view.set_read_only(True)
