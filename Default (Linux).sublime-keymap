@@ -1,6 +1,6 @@
 [
     {
-        "keys" : ["ctrl+shift+m"],
+        "keys" : ["ctrl+alt+m"],
         "command" : "manpage"
     }
 ]
