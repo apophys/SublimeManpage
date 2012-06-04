@@ -20,10 +20,10 @@ class ManpageCommand(sublime_plugin.WindowCommand):
                                      self.on_done, None, None)
 
     def on_done(self, line):
-        ManpageThread(self.window, line).start()
+        ManpageApiCall(self.window, line).start()
 
 
-class ManpageThread(threading.Thread):
+class ManpageApiCall(threading.Thread):
     def __init__(self, window, func):
         self.window = window
         self.req_function = func
@@ -90,9 +90,10 @@ class ManpageThread(threading.Thread):
             if match:
                 dct = match.groupdict()
                 if dct["sect"] in sections and dct["func"].find(self.req_function) != -1:
-                    self.function_list.append([dct["func"],
-                                              "(%s) - %s" % (dct["sect"], dct["desc"],)])
-            else:
+                    func_desc = "(%s) - %s" % (dct["sect"], dct["desc"],)
+                    self.function_list.append([dct["func"], func_desc])
+            elif len(function_descriptions) is 1:
+                # temporary hack: better detect in some more clever way
                 sublime.status_message(item)
                 return list()
 
@@ -106,7 +107,7 @@ class ManpageThread(threading.Thread):
         cmd_man = ["man", section, function[0]]
         cmd_col = ["col", "-b"]
 
-        man = Popen(cmd_man, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        man = Popen(cmd_man, stdin=None, stdout=PIPE, stderr=PIPE)
         col = Popen(cmd_col, stdin=man.stdout, stdout=PIPE, stderr=PIPE)
 
         result = col.communicate()[0]
