@@ -4,7 +4,7 @@ SublimeManpage is small plugin for calling `man` utility from
 Sublime Text 2 editor. Result is opened in new tab inside the
 editor.
 
-Plugin *does not* work on Windows.
+Plugin **does not** work on Windows.
 
 # Install
 
@@ -27,7 +27,6 @@ for C language - sections 2, 3 and 3p (system calls, function calls)
 ```
 
 If you need some other sections, just append the section number to this list.
-Plugin works with sections defined by regular expression `\(\dp?m?\)`.
 
 # Usage
 

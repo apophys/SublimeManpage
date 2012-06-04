@@ -8,6 +8,7 @@ import sublime
 import sublime_plugin
 
 WHATIS_RE = "^(?P<func>\w+[^\(])\s*\((?P<sect>\dp?m?)\)\s+-\s+(?P<desc>.*)$"
+# FIXME: section part allows 2m which is not acceptable
 
 class ManpageCommand(sublime_plugin.WindowCommand):
     def run(self):
