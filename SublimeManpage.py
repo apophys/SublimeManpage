@@ -122,8 +122,11 @@ class ManpageApiCall(threading.Thread):
         view.set_name("%s (%s)" % (desc["func"], desc["sect"]))
         view.set_scratch(True)
 
-        loc = locale.getdefaultlocale()[-1]
-        data = manpage.decode(loc)
+        if sublime.platform() is "linux":
+            loc = locale.getdefaultlocale()[-1]
+            data = manpage.decode(loc)
+        else:
+            data = manpage
 
         edit = view.begin_edit()
 
