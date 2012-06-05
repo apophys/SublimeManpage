@@ -126,6 +126,8 @@ class ManpageApiCall(threading.Thread):
             loc = locale.getdefaultlocale()[-1]
             data = manpage.decode(loc)
         else:
+            # python bundled with Sublime Text raises ValueError for UTF-8
+            # on OS X
             data = manpage
 
         edit = view.begin_edit()
