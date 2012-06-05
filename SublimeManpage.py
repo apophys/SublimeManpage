@@ -1,5 +1,6 @@
 # -*- coding: utf-8 –*–
 
+import locale
 import threading
 import re
 from subprocess import Popen, PIPE
@@ -7,8 +8,8 @@ from subprocess import Popen, PIPE
 import sublime
 import sublime_plugin
 
-WHATIS_RE = "^(?P<func>\w+[^\(])\s*\((?P<sect>\dp?m?)\)\s+-\s+(?P<desc>.*)$"
-# FIXME: section part allows 2m which is not acceptable
+
+WHATIS_RE = "^(?P<func>\w+)\s*\((?P<sect>\dp?m?)\)\s+-\s+(?P<desc>.*)$"
 
 class ManpageCommand(sublime_plugin.WindowCommand):
     def run(self):
@@ -121,8 +122,11 @@ class ManpageApiCall(threading.Thread):
         view.set_name("%s (%s)" % (desc["func"], desc["sect"]))
         view.set_scratch(True)
 
+        loc = locale.getdefaultlocale()[-1]
+        data = manpage.decode(loc)
+
         edit = view.begin_edit()
 
-        view.insert(edit, 0, manpage)
+        view.insert(edit, 0, data)
         view.end_edit(edit)
         view.set_read_only(True)
