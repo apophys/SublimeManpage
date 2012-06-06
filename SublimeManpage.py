@@ -9,7 +9,6 @@ import sublime
 import sublime_plugin
 
 
-WHATIS_RE = "^(?P<func>\w+)\s*\((?P<sect>\dp?m?)\)\s+-\s+(?P<desc>.*)$"
 
 class ManpageCommand(sublime_plugin.WindowCommand):
     def run(self):
@@ -27,10 +26,14 @@ class ManpageCommand(sublime_plugin.WindowCommand):
 
 class ManpageApiCall(threading.Thread):
     def __init__(self, window, func):
+        WHATIS_RE = "^(?P<func>\w+)\s*\((?P<sect>[^\)+])\)\s+-\s+(?P<desc>.*)$"
+        MULTICOL_RE = "(?P<func_lst>[^-]+)-(?P<desc>.*)"
         self.window = window
         self.req_function = func
         self.function_list = list()
         self.settings = sublime.load_settings("Preferences.sublime-settings")
+        self.whatis_re = re.compile(WHATIS_RE)
+        self.multicol_re = re.compile(MULTICOL_RE)
         threading.Thread.__init__(self)
 
     def run(self):
@@ -63,8 +66,7 @@ class ManpageApiCall(threading.Thread):
             for line in lines:
                 if ',' in line:
                     # simple str.split() crashes on multiple '-' in description
-                    pattern = "(?P<func_lst>[^-]+)-(?P<desc>.*)"
-                    splited_line = re.match(pattern, line)
+                    splited_line = re.match(self.multicol_re, line)
                     splited_line = splited_line.groupdict()
                     func_lst, desc = splited_line["func_lst"], splited_line["desc"]
 
@@ -88,7 +90,7 @@ class ManpageApiCall(threading.Thread):
         sections = self.settings.get("sections", ["2", "3"])
 
         for item in function_descriptions:
-            match = re.search(WHATIS_RE, item)
+            match = re.search(self.whatis_re, item)
             if match:
                 dct = match.groupdict()
                 if dct["sect"] in sections and dct["func"].find(self.req_function) != -1:
