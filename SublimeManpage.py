@@ -78,7 +78,7 @@ class ManpageApiCall(threading.Thread):
             return splited
 
 
-        whatis = Popen(["whatis", self.req_function], stdin=PIPE,
+        whatis = Popen(["whatis", self.req_function], stdin=None,
                        stdout=PIPE, stderr=PIPE)
 
         function_descriptions = whatis.communicate()[0]
@@ -116,7 +116,7 @@ class ManpageApiCall(threading.Thread):
 
         result = col.communicate()[0]
 
-        return (result, { "func" : function[0], "sect" : section})
+        return (result, { "func" : function[0], "sect" : section })
 
     def _render_manpage(self, manpage, desc):
         view = self.window.new_file()
