@@ -66,8 +66,8 @@ class ManpageApiCall(threading.Thread):
             for line in lines:
                 if ',' in line:
                     # simple str.split() crashes on multiple '-' in description
-                    splited_line = re.match(self.multicol_re, line)
-                    splited_line = splited_line.groupdict()
+                    line_match = re.match(self.multicol_re, line)
+                    splited_line = line_match.groupdict()
                     func_lst, desc = splited_line["func_lst"], splited_line["desc"]
 
                     for f in func_lst.split(','):
@@ -81,8 +81,8 @@ class ManpageApiCall(threading.Thread):
         whatis = Popen(["whatis", self.req_function], stdin=None,
                        stdout=PIPE, stderr=PIPE)
 
-        function_descriptions = whatis.communicate()[0]
-        function_descriptions = function_descriptions.rstrip().split('\n')
+        whatis_output = whatis.communicate()[0]
+        function_descriptions = whatis_output.rstrip().split('\n')
         function_descriptions = split_whatis(function_descriptions)
 
         filtered_functions = list()
@@ -93,7 +93,8 @@ class ManpageApiCall(threading.Thread):
             match = re.search(self.whatis_re, item)
             if match:
                 dct = match.groupdict()
-                if dct["sect"] in sections and dct["func"].find(self.req_function) != -1:
+                func_found = dct["func"].find(self.req_function) != -1
+                if dct["sect"] in sections and func_found:
                     func_desc = "(%s) - %s" % (dct["sect"], dct["desc"],)
                     self.function_list.append([dct["func"], func_desc])
             elif len(function_descriptions) is 1:
