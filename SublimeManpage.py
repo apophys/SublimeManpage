@@ -9,7 +9,6 @@ import sublime
 import sublime_plugin
 
 
-
 class ManpageCommand(sublime_plugin.WindowCommand):
     def run(self):
         if sublime.platform() not in ["osx", "linux"]:
@@ -68,7 +67,8 @@ class ManpageApiCall(threading.Thread):
                     # simple str.split() crashes on multiple '-' in description
                     line_match = re.match(self.multicol_re, line)
                     splited_line = line_match.groupdict()
-                    func_lst, desc = splited_line["func_lst"], splited_line["desc"]
+                    func_lst = splited_line["func_lst"]
+                    desc = splited_line["desc"]
 
                     for f in func_lst.split(','):
                         splited.append("%s - %s" % (f.strip(), desc))
@@ -76,7 +76,6 @@ class ManpageApiCall(threading.Thread):
                     splited.append(line)
 
             return splited
-
 
         whatis = Popen(["whatis", self.req_function], stdin=None,
                        stdout=PIPE, stderr=PIPE)
@@ -117,7 +116,7 @@ class ManpageApiCall(threading.Thread):
 
         result = col.communicate()[0]
 
-        return (result, { "func" : function[0], "sect" : section })
+        return (result, {"func": function[0], "sect": section})
 
     def _render_manpage(self, manpage, desc):
         view = self.window.new_file()
