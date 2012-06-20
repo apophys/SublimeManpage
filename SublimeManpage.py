@@ -26,13 +26,11 @@ class ManpageCommand(sublime_plugin.WindowCommand):
 class ManpageApiCall(threading.Thread):
     def __init__(self, window, func):
         WHATIS_RE = "^(?P<func>\w+)\s*\((?P<sect>[^\)+])\)\s+-\s+(?P<desc>.*)$"
-        MULTICOL_RE = "(?P<func_lst>[^-]+)-(?P<desc>.*)"
         self.window = window
         self.req_function = func
         self.function_list = list()
         self.settings = sublime.load_settings("Preferences.sublime-settings")
         self.whatis_re = re.compile(WHATIS_RE)
-        self.multicol_re = re.compile(MULTICOL_RE)
         threading.Thread.__init__(self)
 
     def run(self):
@@ -64,11 +62,7 @@ class ManpageApiCall(threading.Thread):
 
             for line in lines:
                 if ',' in line:
-                    # simple str.split() crashes on multiple '-' in description
-                    line_match = re.match(self.multicol_re, line)
-                    splited_line = line_match.groupdict()
-                    func_lst = splited_line["func_lst"]
-                    desc = splited_line["desc"]
+                    func_lst, desc = line.split('-', 1)
 
                     for f in func_lst.split(','):
                         splited.append("%s - %s" % (f.strip(), desc))
