@@ -8,10 +8,13 @@ Plugin **does not** work on Windows. At least not now.
 
 # Install
 
-Clone this reporitory from github:
+Install with [Package Control](http://wbond.net/sublime_packages/package_control).
+
+`Command Palette` > `Package Control: Install Package` > `SublimeManpage`
+
+Or clone this reporitory from github:
 
 ```bash
-$ cd Sublime Text 2/Packages
 $ git clone https://apophys@github.com/apophys/SublimeManpage.git
 ```
 
