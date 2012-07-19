@@ -4,7 +4,7 @@ SublimeManpage is small plugin for calling `man` utility from
 Sublime Text 2 editor. Result is opened in new tab inside the
 editor.
 
-Plugin **does not** work on Windows. At least not now.
+Plugin **does not** work on Windows. At least for now.
 
 # Install
 
