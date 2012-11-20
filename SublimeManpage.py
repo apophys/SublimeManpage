@@ -16,7 +16,7 @@ class ManpageCommand(sublime_plugin.WindowCommand):
                                   % sublime.platform())
             return
 
-        self.window.show_input_panel("Type function name:", "",
+        self.window.show_input_panel("Type function name or command:", "",
                                      self.on_done, None, None)
 
     def on_done(self, line):
