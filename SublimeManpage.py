@@ -29,7 +29,7 @@ class ManpageApiCall(threading.Thread):
         self.window = window
         self.req_function = func
         self.function_list = list()
-        self.settings = sublime.load_settings("Preferences.sublime-settings")
+        self.settings = sublime.load_settings("SublimeManpage.sublime-settings")
         self.whatis_re = re.compile(WHATIS_RE)
         threading.Thread.__init__(self)
 
