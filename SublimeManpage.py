@@ -16,7 +16,7 @@ class ManpageCommand(sublime_plugin.WindowCommand):
                                   % sublime.platform())
             return
 
-        self.window.show_input_panel("Type function name:", "",
+        self.window.show_input_panel("Type function name or command:", "",
                                      self.on_done, None, None)
 
     def on_done(self, line):
@@ -29,7 +29,7 @@ class ManpageApiCall(threading.Thread):
         self.window = window
         self.req_function = func
         self.function_list = list()
-        self.settings = sublime.load_settings("Preferences.sublime-settings")
+        self.settings = sublime.load_settings("SublimeManpage.sublime-settings")
         self.whatis_re = re.compile(WHATIS_RE)
         threading.Thread.__init__(self)
 
