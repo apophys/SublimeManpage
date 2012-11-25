@@ -2,5 +2,12 @@
     {
         "caption" : "Manpage: Open manual page",
         "command" : "manpage"
+    },
+    {
+    	"caption" : "Preferences: SublimeManpage Settings - Default",
+		"command": "open_file", "args":
+        {
+            "file": "${packages}/SublimeManpage/SublimeManpage.sublime-settings"
+        },    	
     }
 ]
