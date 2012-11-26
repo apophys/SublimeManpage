@@ -44,6 +44,10 @@ Use `Manpage: Open manual page` option, from command palette or on OS X
 key binding `super + shift + m` or key binding `ctrl + alt + m` on Linux.
 
 
+# Contributors
+
+[Levente Varga](https://github.com/crazybyte)
+
 # License
 
 This plugin is licensed under the MIT license.
