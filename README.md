@@ -25,7 +25,9 @@ for C language - sections 2, 3 and 3p (system calls, function calls).
 You can edit the configuration via the menu entry.
 
 `Preferences` -> `Package Settings` -> `SublimeManpage` -> `Settings - Default`
+
 Or
+
 `Command Palette` > `Preferences: SublimeManpage Settings - Default`
 
 ```json
