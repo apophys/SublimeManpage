@@ -2,5 +2,9 @@
     {
         "keys" : ["ctrl+alt+m"],
         "command" : "manpage"
-    }
+    },
+    {
+        "keys" : ["ctrl+alt+w"],
+        "command" : "find_manpage_from_selection"
+    }    
 ]
