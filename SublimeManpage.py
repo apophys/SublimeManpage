@@ -23,6 +23,26 @@ class ManpageCommand(sublime_plugin.WindowCommand):
         ManpageApiCall(self.window, line).start()
 
 
+class FindManpageFromSelectionCommand(sublime_plugin.WindowCommand):
+    def run(self):
+        currentView = self.window.active_view()
+        if sublime.platform() not in ["osx", "linux"]:
+            sublime.error_message("Manpage: Platform %s is not supported."
+                                  % sublime.platform())
+            return
+
+        wordEnd = currentView.sel()[0].end()
+        if currentView.sel()[0].empty():
+            word = currentView.substr(currentView.word(wordEnd)).lower()
+        else:
+            word = currentView.substr(currentView.sel()[0]).lower()
+        if word is None or len(word) <= 1:
+            sublime.status_message('No word selected')
+            return
+        sublime.status_message("Selected word is: " + word)
+        ManpageApiCall(self.window, word).start()
+
+
 class ManpageApiCall(threading.Thread):
     def __init__(self, window, func):
         WHATIS_RE = "^(?P<func>\w+)\s*\((?P<sect>[^\)+])\)\s+-\s+(?P<desc>.*)$"
@@ -77,8 +97,6 @@ class ManpageApiCall(threading.Thread):
         whatis_output = whatis.communicate()[0]
         function_descriptions = whatis_output.rstrip().split('\n')
         function_descriptions = split_whatis(function_descriptions)
-
-        filtered_functions = list()
 
         sections = self.settings.get("sections", ["2", "3"])
 
