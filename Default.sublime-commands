@@ -4,8 +4,12 @@
         "command" : "manpage"
     },
     {
-    	"caption" : "Preferences: SublimeManpage Settings - Default",
-		"command": "open_file", "args":
+        "caption" : "Manpage: Open manual page for word under cursor",
+        "command" : "find_manpage_from_selection"
+    },
+    {
+        "caption" : "Preferences: SublimeManpage Settings - Default",
+        "command": "open_file", "args":
         {
             "file": "${packages}/SublimeManpage/SublimeManpage.sublime-settings"
         }
