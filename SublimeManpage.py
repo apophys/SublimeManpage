@@ -1,13 +1,17 @@
 # -*- coding: utf-8 –*–
 
 import locale
-import threading
+import logging
 import re
+import threading
+
 from subprocess import Popen, PIPE
 
 import sublime
 import sublime_plugin
 
+# if sublime.platform() in ["osx", "linux"]:
+#     logging.basicConfig(filename="/tmp/sublime_manpage.log", level=logging.DEBUG)
 
 class ManpageCommand(sublime_plugin.WindowCommand):
     def run(self):
@@ -48,7 +52,7 @@ class ManpageApiCall(threading.Thread):
         WHATIS_RE = "^(?P<func>\w+)\s*\((?P<sect>[^\)+])\)\s+-\s+(?P<desc>.*)$"
         self.window = window
         self.req_function = func
-        self.function_list = list()
+        self.function_list = []
         self.settings = sublime.load_settings("SublimeManpage.sublime-settings")
         self.whatis_re = re.compile(WHATIS_RE)
         threading.Thread.__init__(self)
@@ -73,12 +77,15 @@ class ManpageApiCall(threading.Thread):
         if picked == -1:
             return
 
+        logging.debug("[sublime_manpage:on_done] (%d, %d)"
+                      % (len(self.function_list), picked))
+
         manpage, title = self._call_man(self.function_list[picked])
         self._render_manpage(manpage, title)
 
     def _get_function_list(self):
         def split_whatis(lines):
-            splited = list()
+            splited = []
 
             for line in lines:
                 if ',' in line:
@@ -99,6 +106,7 @@ class ManpageApiCall(threading.Thread):
         function_descriptions = split_whatis(function_descriptions)
 
         sections = self.settings.get("sections", ["2", "3"])
+        exact_match = self.settings.get("exact_match", False)
 
         for item in function_descriptions:
             match = re.search(self.whatis_re, item)
@@ -107,11 +115,21 @@ class ManpageApiCall(threading.Thread):
                 func_found = dct["func"].find(self.req_function) != -1
                 if dct["sect"] in sections and func_found:
                     func_desc = "(%s) - %s" % (dct["sect"], dct["desc"],)
-                    self.function_list.append([dct["func"], func_desc])
+                    entry = [dct["func"], func_desc]
+
+                    logging.debug("[sublime_manpage] Exact match: [%s]; searched function: [%s]; parsed function: [%s]" %
+                                  (exact_match, self.req_function, dct["func"]))
+
+                    if exact_match and dct["func"] == self.req_function:
+                        # Returning *first* exact match.
+                        logging.debug("[sublime_manpage] Match for [%s]" % dct["func"])
+                        self.function_list = [entry]
+                        return self.function_list
+                    else:
+                        self.function_list.append(entry)
             elif len(function_descriptions) is 1:
                 # temporary hack: better detect in some more clever way
                 sublime.status_message(item)
-                return list()
 
         return self.function_list
 
@@ -120,6 +138,8 @@ class ManpageApiCall(threading.Thread):
         # screw it!
         section = function[1].split('-')[0].strip(" ()")
 
+        logging.debug("[sublime_manpage] Calling man for [%s] in section [%s]" %
+                      (function[0], section))
         cmd_man = ["man", section, function[0]]
         cmd_col = ["col", "-b"]
 
