@@ -13,6 +13,17 @@ import sublime_plugin
 # if sublime.platform() in ["osx", "linux"]:
 #     logging.basicConfig(filename="/tmp/sublime_manpage.log", level=logging.DEBUG)
 
+class ExactMatchSettings(sublime_plugin.WindowCommand):
+    """ This writes changes to User Settings """
+    def run(self, mode=False):
+        settings = sublime.load_settings("SublimeManpage.sublime-settings")
+        if type(mode) is bool:
+            settings.set("exact_match", mode)
+            sublime.save_settings("SublimeManpage.sublime-settings")
+        else:
+            sublime.status_message("Unexpected parameter type.")
+
+
 class ManpageCommand(sublime_plugin.WindowCommand):
     def run(self):
         if sublime.platform() not in ["osx", "linux"]:

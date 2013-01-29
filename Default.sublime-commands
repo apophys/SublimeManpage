@@ -13,5 +13,26 @@
         {
             "file": "${packages}/SublimeManpage/SublimeManpage.sublime-settings"
         }
+    },
+    {
+        "caption" : "Preferences: SublimeManpage Settings - User",
+        "command": "open_file", "args":
+        {
+            "file": "${packages}/User/SublimeManpage.sublime-settings"
+        }
+    },
+    {
+        "caption" : "SublimeManpage - Enable exact match",
+        "command" : "exact_match_settings", "args":
+        {
+            "mode" : true
+        }
+    },
+    {
+        "caption" : "SublimeManpage - Disable exact match",
+        "command" : "exact_match_settings", "args":
+        {
+            "mode" : false
+        }
     }
 ]
