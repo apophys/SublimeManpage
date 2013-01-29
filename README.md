@@ -22,17 +22,21 @@ $ git clone https://apophys@github.com/apophys/SublimeManpage.git
 
 Package is shipped with default configuration prepared
 for C language - sections 2, 3 and 3p (system calls, function calls).
-You can edit the configuration via the menu entry.
+In default, exact match is disabled. Exact match can be turned on/off from
+Command Palette.
+
+You can edit the configuration in the user settings.
 
 `Preferences` -> `Package Settings` -> `SublimeManpage` -> `Settings - Default`
 
 Or
 
-`Command Palette` > `Preferences: SublimeManpage Settings - Default`
+`Command Palette` > `Preferences: SublimeManpage Settings - User`
 
 ```json
 {
-    "sections" : [ "2", "3", "3p"]
+    "sections" : [ "2", "3", "3p"],
+    "exact_match" : false
 }
 ```
 
@@ -42,7 +46,13 @@ If you need some other sections, just append the section number to this list.
 
 Use `Manpage: Open manual page` option, from command palette or on OS X
 key binding `super + shift + m` or key binding `ctrl + alt + m` on Linux.
+This will pop up a form in which you can write the function name.
 
+Another possibility is to use `super + alt + w` or `ctrl + alt + w`
+on OS X and Linux respectively to lookup the word under the cursor directly.
+
+If `exact_match` is set to true, plugin will open manpage for the *first exact match*
+in specified sections.
 
 # Contributors
 

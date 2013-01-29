@@ -1,0 +1,4 @@
+= 2013-01-29
+
+* Enabled cursor selection
+* Added functionality for exact matching of input. (Might not work as expected.)
