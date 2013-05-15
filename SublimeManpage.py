@@ -138,9 +138,7 @@ class ManpageApiCall(threading.Thread):
                         self.function_list.append(entry)
             elif len(function_descriptions) is 1:
                 # temporary hack: better detect in some more clever way
-                sublime.error_message("Manpage: Function '%s' found, but does not match 'whatis' regular expression"
-                    % self.req_function)
-                sublime.status_message(item)
+                sublime.status_message("Function %s not found in whatis database." % self.req_function)
 
         return self.function_list
 
