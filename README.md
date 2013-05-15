@@ -62,6 +62,7 @@ in specified sections.
 # Contributors
 
 [Levente Varga](https://github.com/crazybyte)
+[Hector Hurtarte](https://github.com/hectorh30)
 
 # License
 
