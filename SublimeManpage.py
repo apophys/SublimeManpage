@@ -10,8 +10,6 @@ from subprocess import Popen, PIPE
 import sublime
 import sublime_plugin
 
-# if sublime.platform() in ["osx", "linux"]:
-#     logging.basicConfig(filename="/tmp/sublime_manpage.log", level=logging.DEBUG)
 
 class ExactMatchSettings(sublime_plugin.WindowCommand):
     """ This writes changes to User Settings """
