@@ -1,6 +1,7 @@
 = 2013-05-15
 * Added support for `exact match`
 * Supports commands with dash
+* Updated error messages in status bar
 
 = 2013-01-29
 
