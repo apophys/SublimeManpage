@@ -117,6 +117,10 @@ class ManpageApiCall(threading.Thread):
         sections = self.settings.get("sections", ["2", "3"])
         exact_match = self.settings.get("exact_match", False)
 
+        if len(function_descriptions) is 1 and not function_descriptions[0]:
+            sublime.status_message("Manpage: Function '%s' not found" % self.req_function)
+            return []
+
         for item in function_descriptions:
             match = re.search(self.whatis_re, item)
             if match:
@@ -136,6 +140,10 @@ class ManpageApiCall(threading.Thread):
                         return self.function_list
                     else:
                         self.function_list.append(entry)
+                elif func_found:
+                    sublime.status_message("Manpage: function %s found but section %s is not in configuration file."
+                        % (self.req_function, dct["sect"]))
+                    return []
             elif len(function_descriptions) is 1:
                 # temporary hack: better detect in some more clever way
                 sublime.status_message("Function %s not found in whatis database." % self.req_function)
