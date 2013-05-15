@@ -42,6 +42,11 @@ Or
 
 If you need some other sections, just append the section number to this list.
 
+## Exact match
+
+The plugin now supports an `exact match` functionality. You can turn it on/off either
+manually or from command palette.
+
 # Usage
 
 Use `Manpage: Open manual page` option, from command palette or on OS X

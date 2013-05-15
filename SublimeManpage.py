@@ -58,7 +58,7 @@ class FindManpageFromSelectionCommand(sublime_plugin.WindowCommand):
 
 class ManpageApiCall(threading.Thread):
     def __init__(self, window, func):
-        WHATIS_RE = "^(?P<func>\w+)\s*\((?P<sect>[^\)+])\)\s+-\s+(?P<desc>.*)$"
+        WHATIS_RE = "^(?P<func>[\w-]+)\s*\((?P<sect>[^\)+])\)\s+-\s+(?P<desc>.*)$"
         self.window = window
         self.req_function = func
         self.function_list = []
@@ -138,6 +138,8 @@ class ManpageApiCall(threading.Thread):
                         self.function_list.append(entry)
             elif len(function_descriptions) is 1:
                 # temporary hack: better detect in some more clever way
+                sublime.error_message("Manpage: Function '%s' found, but does not match 'whatis' regular expression"
+                    % self.req_function)
                 sublime.status_message(item)
 
         return self.function_list
