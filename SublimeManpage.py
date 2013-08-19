@@ -4,11 +4,22 @@ import locale
 import logging
 import re
 import threading
+import webbrowser
 
 from subprocess import Popen, PIPE
+from urllib2 import urlopen, HTTPError
+
 
 import sublime
 import sublime_plugin
+
+def manpage_api_factory(window, word):
+    """Generate manpage api object"""
+
+    if sublime.platform() in ["osx", "linux"]:
+        return ManpageApiCall(window, word)
+    else:
+        return ManpageWebCall(window, word)
 
 
 class ExactMatchSettings(sublime_plugin.WindowCommand):
@@ -24,25 +35,17 @@ class ExactMatchSettings(sublime_plugin.WindowCommand):
 
 class ManpageCommand(sublime_plugin.WindowCommand):
     def run(self):
-        if sublime.platform() not in ["osx", "linux"]:
-            sublime.error_message("Manpage: Platform %s is not supported."
-                                  % sublime.platform())
-            return
-
         self.window.show_input_panel("Type function name or command:", "",
                                      self.on_done, None, None)
 
     def on_done(self, line):
-        ManpageApiCall(self.window, line).start()
+        command = manpage_api_factory(self.window, line)
+        command.start()
 
 
 class FindManpageFromSelectionCommand(sublime_plugin.WindowCommand):
     def run(self):
         currentView = self.window.active_view()
-        if sublime.platform() not in ["osx", "linux"]:
-            sublime.error_message("Manpage: Platform %s is not supported."
-                                  % sublime.platform())
-            return
 
         wordEnd = currentView.sel()[0].end()
         if currentView.sel()[0].empty():
@@ -53,7 +56,9 @@ class FindManpageFromSelectionCommand(sublime_plugin.WindowCommand):
             sublime.status_message('No word selected')
             return
         sublime.status_message("Selected word is: " + word)
-        ManpageApiCall(self.window, word).start()
+
+        command = manpage_api_factory(self.window, word)
+        command.start()
 
 
 class ManpageApiCall(threading.Thread):
@@ -118,7 +123,8 @@ class ManpageApiCall(threading.Thread):
         exact_match = self.settings.get("exact_match", False)
 
         if len(function_descriptions) is 1 and not function_descriptions[0]:
-            sublime.status_message("Manpage: Function '%s' not found" % self.req_function)
+            sublime.status_message("Manpage: Function '%s' not found"
+                                   % self.req_function)
             return []
 
         func_found_global = False
@@ -131,13 +137,15 @@ class ManpageApiCall(threading.Thread):
                 if dct["sect"] in sections and func_found:
                     func_desc = "(%s) - %s" % (dct["sect"], dct["desc"],)
                     entry = [dct["func"], func_desc]
-
-                    logging.debug("[sublime_manpage] Exact match: [%s]; searched function: [%s]; parsed function: [%s]" %
-                                  (exact_match, self.req_function, dct["func"]))
+                    logging.debug("[sublime_manpage] Exact match: [%s]; \
+                                  searched function: [%s]; \
+                                  parsed function: [%s]"
+                                  % (exact_match, self.req_function, dct["func"]))
 
                     if exact_match and dct["func"] == self.req_function:
                         # Returning *first* exact match.
-                        logging.debug("[sublime_manpage] Match for [%s]" % dct["func"])
+                        logging.debug("[sublime_manpage] Match for [%s]"
+                                      % dct["func"])
                         self.function_list = [entry]
                         return self.function_list
                     else:
@@ -149,8 +157,6 @@ class ManpageApiCall(threading.Thread):
             if func_found_global and not self.function_list:
                 sublime.status_message("Manpage: function %s found but its section is not in configuration file."
                                        % self.req_function)
-
-
         return self.function_list
 
     def _call_man(self, function):
@@ -189,3 +195,41 @@ class ManpageApiCall(threading.Thread):
         view.insert(edit, 0, data)
         view.end_edit(edit)
         view.set_read_only(True)
+
+
+class ManpageWebCall(threading.Thread):
+
+    URL = "http://www.linuxmanpages.com/man%(section)s/%(function)s.%(section)s.php"
+
+    def __init__(self, window, func):
+        self.window = window # TODO: refactor
+        self.function = func
+        self.settings = sublime.load_settings("SublimeManpage.sublime-settings")
+        threading.Thread.__init__(self)
+
+    def run(self):
+        def get_manpage_url(url_data):
+            for item in url_data:
+                try:
+                    url = ManpageWebCall.URL % item
+                    f = urlopen(url)
+                    f.close()
+                    if f.getcode() is 200:
+                        return url
+                    else:
+                        pass # potentially ignoring redirects
+                except HTTPError, e:
+                    pass
+            else:
+                return None
+
+        sections = self.settings.get("sections", ["2", "3"])
+        url_data = ({ "function" : self.function, "section" : s} for s in sections)
+
+        url = get_manpage_url(url_data)
+
+        if url:
+            webbrowser.open(url)
+        else:
+            sublime.error_message("Manpage for '%s' not found in sections [%s]."
+                                  % (self.function, ', '.join(sections)))
