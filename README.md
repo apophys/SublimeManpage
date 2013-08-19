@@ -4,7 +4,8 @@ SublimeManpage is small plugin for calling `man` utility from
 Sublime Text 2 editor. Result is opened in new tab inside the
 editor.
 
-Plugin **does not** work on Windows. At least for now.
+Plugin now works also on platforms other than Linux and OS X. Though
+in a limited way.
 
 # Install
 
@@ -58,6 +59,15 @@ on OS X and Linux respectively to lookup the word under the cursor directly.
 
 If `exact_match` is set to true, plugin will open manpage for the *first exact match*
 in specified sections.
+
+# Windows (*) support
+
+On windows ((*) any platform other than linux and os x), manual page is opened
+in web browser. The plugin currently uses (http://www.linuxmanpages.com LinuxManPages).
+In this case, plugin does not support listing matching functions, but opens
+first exact match according to sections as defined in settings.
+
+If functions is not found, an error message is raised.
 
 # Contributors
 
