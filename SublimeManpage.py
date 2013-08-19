@@ -121,11 +121,13 @@ class ManpageApiCall(threading.Thread):
             sublime.status_message("Manpage: Function '%s' not found" % self.req_function)
             return []
 
+        func_found_global = False
         for item in function_descriptions:
             match = re.search(self.whatis_re, item)
             if match:
                 dct = match.groupdict()
                 func_found = dct["func"].find(self.req_function) != -1
+                func_found_global = func_found_global or func_found
                 if dct["sect"] in sections and func_found:
                     func_desc = "(%s) - %s" % (dct["sect"], dct["desc"],)
                     entry = [dct["func"], func_desc]
@@ -140,13 +142,14 @@ class ManpageApiCall(threading.Thread):
                         return self.function_list
                     else:
                         self.function_list.append(entry)
-                elif func_found:
-                    sublime.status_message("Manpage: function %s found but section %s is not in configuration file."
-                        % (self.req_function, dct["sect"]))
-                    return []
             elif len(function_descriptions) is 1:
                 # temporary hack: better detect in some more clever way
                 sublime.status_message("Function %s not found in whatis database." % self.req_function)
+        else:
+            if func_found_global and not self.function_list:
+                sublime.status_message("Manpage: function %s found but its section is not in configuration file."
+                                       % self.req_function)
+
 
         return self.function_list
 
