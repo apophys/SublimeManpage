@@ -123,7 +123,8 @@ class ManpageApiCall(threading.Thread):
         exact_match = self.settings.get("exact_match", False)
 
         if len(function_descriptions) is 1 and not function_descriptions[0]:
-            sublime.status_message("Manpage: Function '%s' not found" % self.req_function)
+            sublime.status_message("Manpage: Function '%s' not found"
+                                   % self.req_function)
             return []
 
         for item in function_descriptions:
@@ -134,24 +135,27 @@ class ManpageApiCall(threading.Thread):
                 if dct["sect"] in sections and func_found:
                     func_desc = "(%s) - %s" % (dct["sect"], dct["desc"],)
                     entry = [dct["func"], func_desc]
-
-                    logging.debug("[sublime_manpage] Exact match: [%s]; searched function: [%s]; parsed function: [%s]" %
-                                  (exact_match, self.req_function, dct["func"]))
+                    logging.debug("[sublime_manpage] Exact match: [%s]; \
+                                  searched function: [%s]; \
+                                  parsed function: [%s]"
+                                  % (exact_match, self.req_function, dct["func"]))
 
                     if exact_match and dct["func"] == self.req_function:
                         # Returning *first* exact match.
-                        logging.debug("[sublime_manpage] Match for [%s]" % dct["func"])
+                        logging.debug("[sublime_manpage] Match for [%s]"
+                                      % dct["func"])
                         self.function_list = [entry]
                         return self.function_list
                     else:
                         self.function_list.append(entry)
                 elif func_found:
-                    sublime.status_message("Manpage: function %s found but section %s is not in configuration file."
-                        % (self.req_function, dct["sect"]))
+                    msg = "Manpage: function %s found but section %s is not in configuration file."
+                    sublime.status_message(msg % (self.req_function, dct["sect"]))
                     return []
             elif len(function_descriptions) is 1:
                 # temporary hack: better detect in some more clever way
-                sublime.status_message("Function %s not found in whatis database." % self.req_function)
+                sublime.status_message("Function %s not found in whatis database."
+                                       % self.req_function)
 
         return self.function_list
 
@@ -195,7 +199,7 @@ class ManpageApiCall(threading.Thread):
 
 class ManpageWebCall(threading.Thread):
 
-    MANPAGE_URL = "http://www.linuxmanpages.com/man%(section)s/%(function)s.%(section)s.php"
+    URL = "http://www.linuxmanpages.com/man%(section)s/%(function)s.%(section)s.php"
 
     def __init__(self, window, func):
         self.window = window # TODO: refactor
@@ -207,7 +211,7 @@ class ManpageWebCall(threading.Thread):
         def get_manpage_url(url_data):
             for item in url_data:
                 try:
-                    url = ManpageWebCall.MANPAGE_URL % item
+                    url = ManpageWebCall.URL % item
                     f = urlopen(url)
                     f.close()
                     if f.getcode() is 200:
