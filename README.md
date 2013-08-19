@@ -64,7 +64,7 @@ in specified sections.
 
 On windows ((*) any platform other than linux and os x), manual page is opened
 in web browser. The plugin currently uses [www.linuxmanpages.com](http://www.linuxmanpages.com).
-In this case, plugin does not support listing matching functions, but opens
+In this case, plugin does not support listing matching functions but opens
 first exact match according to sections as defined in settings.
 
 If functions is not found, an error message is raised.
