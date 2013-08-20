@@ -202,7 +202,7 @@ class ManpageWebCall(threading.Thread):
     URL = "http://www.linuxmanpages.com/man%(section)s/%(function)s.%(section)s.php"
 
     def __init__(self, window, func):
-        self.window = window # TODO: refactor
+        self.window = window
         self.function = func
         self.settings = sublime.load_settings("SublimeManpage.sublime-settings")
         threading.Thread.__init__(self)
