@@ -1,3 +1,8 @@
+= 2013-08-19
+* Fixed issue #14
+* Added support for windows
+* some refactorization
+
 = 2013-05-15
 * Added support for `exact match`
 * Supports commands with dash
