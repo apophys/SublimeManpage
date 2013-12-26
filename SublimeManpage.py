@@ -7,7 +7,7 @@ import threading
 import webbrowser
 
 from subprocess import Popen, PIPE
-from urllib2 import urlopen, HTTPError
+from urllib.request import urlopen, HTTPError
 
 
 import sublime
@@ -115,7 +115,7 @@ class ManpageApiCall(threading.Thread):
         whatis = Popen(["whatis", self.req_function], stdin=None,
                        stdout=PIPE, stderr=PIPE)
 
-        whatis_output = whatis.communicate()[0]
+        whatis_output = str(whatis.communicate()[0], encoding='utf8')
         function_descriptions = whatis_output.rstrip().split('\n')
         function_descriptions = split_whatis(function_descriptions)
 
@@ -188,12 +188,9 @@ class ManpageApiCall(threading.Thread):
         else:
             # python bundled with Sublime Text raises ValueError for UTF-8
             # on OS X
-            data = manpage
+            data = str(manpage, encoding='utf8')
 
-        edit = view.begin_edit()
-
-        view.insert(edit, 0, data)
-        view.end_edit(edit)
+        view.run_command('append', {'characters':data})
         view.set_read_only(True)
 
 
@@ -218,7 +215,7 @@ class ManpageWebCall(threading.Thread):
                         return url
                     else:
                         pass # potentially ignoring redirects
-                except HTTPError, e:
+                except HTTPError:
                     pass
             else:
                 return None
