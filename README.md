@@ -73,6 +73,7 @@ If functions is not found, an error message is raised.
 
 [Levente Varga](https://github.com/crazybyte), 
 [Hector Hurtarte](https://github.com/hectorh30)
+[nirm03](https://github.com/nirm03)
 
 # License
 
